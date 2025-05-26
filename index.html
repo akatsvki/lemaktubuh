@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Rasio Lemak Tubuh</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .input-group label {
+            @apply block text-sm font-medium text-gray-700 mb-1;
+        }
+        .input-group input[type="number"], .input-group select {
+            @apply mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm;
+        }
+        .btn-primary {
+            @apply w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500;
+        }
+        .result-card {
+            @apply mt-6 bg-white shadow-lg rounded-lg p-6;
+        }
+        .result-title {
+            @apply text-xl font-semibold text-gray-800 mb-2;
+        }
+        .result-text {
+            @apply text-3xl font-bold text-indigo-600 mb-2;
+        }
+        .result-interpretation {
+            @apply text-sm text-gray-600;
+        }
+        .error-message {
+            @apply text-red-500 text-sm mt-1;
+        }
+        /* Custom styles for better mobile experience */
+        .container {
+            @apply max-w-lg mx-auto px-4 py-8;
+        }
+        @media (max-width: 640px) {
+            .container {
+                @apply px-2 py-4;
+            }
+            .result-card {
+                @apply p-4;
+            }
+            .result-text {
+                @apply text-2xl;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="container">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-800">Kalkulator Persentase Lemak Tubuh</h1>
+            <p class="text-sm text-gray-600 mt-1">Hitung perkiraan persentase lemak tubuh Anda menggunakan metode lingkar tubuh (U.S. Navy Method).</p>
+        </header>
+
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <div class="space-y-4">
+                <div class="input-group">
+                    <label for="gender">Jenis Kelamin:</label>
+                    <select id="gender">
+                        <option value="male">Pria</option>
+                        <option value="female">Wanita</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="height">Tinggi Badan (cm):</label>
+                    <input type="number" id="height" placeholder="Contoh: 170">
+                    <p id="heightError" class="error-message hidden"></p>
+                </div>
+
+                <div class="input-group">
+                    <label for="waist">Lingkar Pinggang (cm):</label>
+                    <p class="text-xs text-gray-500 mb-1">Ukur di bagian paling sempit atau setinggi pusar.</p>
+                    <input type="number" id="waist" placeholder="Contoh: 80">
+                    <p id="waistError" class="error-message hidden"></p>
+                </div>
+
+                <div class="input-group">
+                    <label for="neck">Lingkar Leher (cm):</label>
+                    <p class="text-xs text-gray-500 mb-1">Ukur di bawah jakun.</p>
+                    <input type="number" id="neck" placeholder="Contoh: 38">
+                    <p id="neckError" class="error-message hidden"></p>
+                </div>
+
+                <div class="input-group hidden" id="hip-group">
+                    <label for="hip">Lingkar Pinggul (cm):</label>
+                    <p class="text-xs text-gray-500 mb-1">Ukur di bagian paling lebar dari pinggul (khusus wanita).</p>
+                    <input type="number" id="hip" placeholder="Contoh: 95">
+                    <p id="hipError" class="error-message hidden"></p>
+                </div>
+
+                <button id="calculateBtn" class="btn-primary">Hitung Persentase Lemak</button>
+            </div>
+        </div>
+
+        <div id="result" class="result-card hidden">
+            <h2 class="result-title">Hasil Perhitungan:</h2>
+            <p id="bfpValue" class="result-text"></p>
+            <p id="bfpCategory" class="font-medium text-lg mb-1"></p>
+            <p id="bfpInterpretation" class="result-interpretation"></p>
+            <div class="mt-4 p-3 bg-indigo-50 rounded-md">
+                <h3 class="text-sm font-semibold text-indigo-700">Catatan Penting:</h3>
+                <p class="text-xs text-indigo-600 mt-1">
+                    Hasil ini adalah perkiraan. Untuk pengukuran yang paling akurat, konsultasikan dengan profesional kesehatan atau pelatih kebugaran. Metode ini mungkin kurang akurat untuk individu yang sangat berotot atau lansia.
+                </p>
+            </div>
+        </div>
+
+        <div class="mt-8 text-center">
+            <h3 class="text-lg font-semibold text-gray-700 mb-2">Kategori Persentase Lemak Tubuh (Umum)</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <h4 class="font-semibold text-indigo-600 mb-1">Pria</h4>
+                    <ul class="list-disc list-inside text-gray-600 space-y-1">
+                        <li><strong>Lemak Esensial:</strong> 2-5%</li>
+                        <li><strong>Atlet:</strong> 6-13%</li>
+                        <li><strong>Kebugaran:</strong> 14-17%</li>
+                        <li><strong>Rata-rata:</strong> 18-24%</li>
+                        <li><strong>Obesitas:</strong> 25%+</li>
+                    </ul>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <h4 class="font-semibold text-pink-600 mb-1">Wanita</h4>
+                    <ul class="list-disc list-inside text-gray-600 space-y-1">
+                        <li><strong>Lemak Esensial:</strong> 10-13%</li>
+                        <li><strong>Atlet:</strong> 14-20%</li>
+                        <li><strong>Kebugaran:</strong> 21-24%</li>
+                        <li><strong>Rata-rata:</strong> 25-31%</li>
+                        <li><strong>Obesitas:</strong> 32%+</li>
+                    </ul>
+                </div>
+            </div>
+             <p class="text-xs text-gray-500 mt-4">Sumber kategori: American Council on Exercise (ACE) dan referensi umum lainnya.</p>
+        </div>
+    </div>
+
+    <script>
+        const genderSelect = document.getElementById('gender');
+        const hipGroup = document.getElementById('hip-group');
+        const calculateBtn = document.getElementById('calculateBtn');
+        const resultDiv = document.getElementById('result');
+        const bfpValueEl = document.getElementById('bfpValue');
+        const bfpCategoryEl = document.getElementById('bfpCategory');
+        const bfpInterpretationEl = document.getElementById('bfpInterpretation');
+
+        // Input fields
+        const heightInput = document.getElementById('height');
+        const waistInput = document.getElementById('waist');
+        const neckInput = document.getElementById('neck');
+        const hipInput = document.getElementById('hip');
+
+        // Error message elements
+        const heightError = document.getElementById('heightError');
+        const waistError = document.getElementById('waistError');
+        const neckError = document.getElementById('neckError');
+        const hipError = document.getElementById('hipError');
+
+        genderSelect.addEventListener('change', function() {
+            if (this.value === 'female') {
+                hipGroup.classList.remove('hidden');
+            } else {
+                hipGroup.classList.add('hidden');
+                hipInput.value = ''; // Clear hip value if male
+                hipError.classList.add('hidden'); // Hide hip error
+            }
+        });
+
+        function validateInput(inputEl, errorEl, fieldName, min = 1, max = 500) {
+            const value = parseFloat(inputEl.value);
+            if (isNaN(value) || value < min || value > max) {
+                errorEl.textContent = `${fieldName} harus antara ${min} dan ${max}.`;
+                errorEl.classList.remove('hidden');
+                inputEl.classList.add('border-red-500');
+                return false;
+            }
+            errorEl.classList.add('hidden');
+            inputEl.classList.remove('border-red-500');
+            return true;
+        }
+
+        calculateBtn.addEventListener('click', function() {
+            // Clear previous errors and results
+            resultDiv.classList.add('hidden');
+            [heightError, waistError, neckError, hipError].forEach(el => el.classList.add('hidden'));
+            [heightInput, waistInput, neckInput, hipInput].forEach(el => el.classList.remove('border-red-500'));
+
+            let isValid = true;
+            isValid = validateInput(heightInput, heightError, "Tinggi badan", 50, 300) && isValid;
+            isValid = validateInput(waistInput, waistError, "Lingkar pinggang", 30, 300) && isValid;
+            isValid = validateInput(neckInput, neckError, "Lingkar leher", 10, 100) && isValid;
+
+            const gender = genderSelect.value;
+            const height = parseFloat(heightInput.value);
+            const waist = parseFloat(waistInput.value);
+            const neck = parseFloat(neckInput.value);
+            let hip = 0;
+
+            if (gender === 'female') {
+                isValid = validateInput(hipInput, hipError, "Lingkar pinggul", 30, 300) && isValid;
+                if (isValid) {
+                    hip = parseFloat(hipInput.value);
+                }
+            }
+            
+            if (!isValid) {
+                // Scroll to the first error for better UX on mobile
+                const firstError = document.querySelector('.error-message:not(.hidden)');
+                if (firstError) {
+                    firstError.parentElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                return;
+            }
+
+            let bfp;
+            // Rumus U.S. Navy
+            // Pria: BFP = 86.010 * log10(pinggang - leher) - 70.041 * log10(tinggi) + 36.76
+            // Wanita: BFP = 163.205 * log10(pinggang + pinggul - leher) - 97.684 * log10(tinggi) - 78.387
+            // Semua ukuran dalam cm
+
+            if (gender === 'male') {
+                if (waist <= neck) {
+                    waistError.textContent = "Lingkar pinggang harus lebih besar dari lingkar leher untuk pria.";
+                    waistError.classList.remove('hidden');
+                    waistInput.classList.add('border-red-500');
+                    return;
+                }
+                bfp = 86.010 * Math.log10(waist - neck) - 70.041 * Math.log10(height) + 36.76;
+            } else { // female
+                if ((waist + hip) <= neck) {
+                     hipError.textContent = "Jumlah lingkar pinggang dan pinggul harus lebih besar dari lingkar leher untuk wanita.";
+                     hipError.classList.remove('hidden');
+                     hipInput.classList.add('border-red-500'); // Or waistInput, or both
+                     return;
+                }
+                bfp = 163.205 * Math.log10(waist + hip - neck) - 97.684 * Math.log10(height) - 78.387;
+            }
+
+            if (bfp < 0) bfp = 0; // BFP cannot be negative
+            if (bfp > 70) bfp = 70; // Cap BFP at a reasonable maximum
+
+            bfpValueEl.textContent = bfp.toFixed(1) + '%';
+            
+            const { category, interpretation } = getBfpCategory(bfp, gender);
+            bfpCategoryEl.textContent = category;
+            bfpInterpretationEl.textContent = interpretation;
+
+            resultDiv.classList.remove('hidden');
+            resultDiv.scrollIntoView({ behavior: 'smooth' });
+        });
+
+        function getBfpCategory(bfp, gender) {
+            let category = "";
+            let interpretation = "";
+
+            if (gender === 'male') {
+                if (bfp < 2) { category = "Di Bawah Lemak Esensial"; interpretation = "Persentase lemak tubuh sangat rendah, berpotensi berisiko bagi kesehatan."; }
+                else if (bfp <= 5) { category = "Lemak Esensial"; interpretation = "Jumlah lemak minimum yang dibutuhkan tubuh untuk fungsi dasar."; }
+                else if (bfp <= 13) { category = "Atlet"; interpretation = "Umumnya dimiliki oleh atlet dengan performa tinggi."; }
+                else if (bfp <= 17) { category = "Kebugaran"; interpretation = "Menunjukkan tingkat kebugaran yang baik dan sehat."; }
+                else if (bfp <= 24) { category = "Rata-rata (Dapat Diterima)"; interpretation = "Tingkat lemak tubuh yang umum dan masih dalam batas sehat."; }
+                else { category = "Obesitas"; interpretation = "Persentase lemak tubuh tinggi, meningkatkan risiko masalah kesehatan."; }
+            } else { // female
+                if (bfp < 10) { category = "Di Bawah Lemak Esensial"; interpretation = "Persentase lemak tubuh sangat rendah, berpotensi berisiko bagi kesehatan."; }
+                else if (bfp <= 13) { category = "Lemak Esensial"; interpretation = "Jumlah lemak minimum yang dibutuhkan tubuh untuk fungsi dasar."; }
+                else if (bfp <= 20) { category = "Atlet"; interpretation = "Umumnya dimiliki oleh atlet dengan performa tinggi."; }
+                else if (bfp <= 24) { category = "Kebugaran"; interpretation = "Menunjukkan tingkat kebugaran yang baik dan sehat."; }
+                else if (bfp <= 31) { category = "Rata-rata (Dapat Diterima)"; interpretation = "Tingkat lemak tubuh yang umum dan masih dalam batas sehat."; }
+                else { category = "Obesitas"; interpretation = "Persentase lemak tubuh tinggi, meningkatkan risiko masalah kesehatan."; }
+            }
+            return { category, interpretation };
+        }
+
+        // Initialize hip group visibility based on default gender (male)
+        if (genderSelect.value === 'female') {
+            hipGroup.classList.remove('hidden');
+        } else {
+            hipGroup.classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
